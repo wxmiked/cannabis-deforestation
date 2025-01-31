@@ -15,3 +15,19 @@ In 2018, the Calaveras County Board of Supervisors banned all commercial cannabi
 The grand jury found that illegal cannabis cultivation has significantly impacted the environment, including deforestation, soil and water contamination, and overuse of groundwater. However, environmental damage often goes unaddressed due to limited coordination among county agencies, insufficient resources for remediation, and a lack of environmental testing at cultivation sites. By 2022, there were 65 licensed cultivation sites, but the number of illegal operations far exceeded this figure.
 
 This summary is based entirely on findings from the Calaveras County Civil Grand Jury Report published in June 2023, which examined the county's efforts to regulate cannabis and the resulting environmental consequences.
+
+## Creating a map of cannabis cultivation sites
+
+To create a geospatial dataset of parcels engaged in cannabis farming under Calaveras County's 2016 Urgency Ordinance, we used publicly available permit data and geographic records ([details at the repo wiki](https://github.com/wxmiked/cannabis-deforestation/wiki)). The dataset includes all parcels that applied for cannabis cultivation permits as required by the ordinance, which mandated proof of active cultivation at the time of application. Parcel boundaries and property ownership information were cross-referenced with county parcel GIS data. This dataset provides a foundation for studying the environmental impacts of cannabis cultivation, including deforestation and resource use, in Calaveras County.
+
+### Extracting cannabis cultivation sites parcel numbers
+
+The Calaveras County Planning Department provided a PDF version of a spreadsheet containing the parcel numbers of all parcels that applied for cannabis cultivation permits ([reports/calaveras-county-civil-grand-jury-2022-2023-cannabis-report.pdf](reports/calaveras-county-civil-grand-jury-2022-2023-cannabis-report.pdf)).
+
+The parcel numbers were extracted to a CSV from the PDF using the following command:
+```
+pdftotext -layout -nopgbrk data-to-import/calaveras-county/public-record-cannabis-cultivation-database-2018-02.pdf - | grep COMMERCIAL | gsed -e 's#.*\([0-9]\{8\}\).*#\1#g' | egrep '^[0-9]{8}' > cannabis-parcels/cannabis-registry-2018-commercial-apns.csv
+```
+
+### Using the cannabis cultivation sites parcel numbers to extract GIS data
+

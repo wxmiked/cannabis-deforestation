@@ -1,0 +1,1 @@
+These tax parcels were downloaded from the [Calaveras County GIS portal](https://opendata-calaveras-gis.opendata.arcgis.com/maps/c5f6a4f64d6f4bc388d00e869b7b7c4e/about) in November 2022.
