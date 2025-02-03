@@ -1,0 +1,12 @@
+<OGRVRTDataSource>
+    <!-- Link to the Shapefile -->
+    <OGRVRTLayer name="parcels">
+        <SrcDataSource>data-to-import/calaveras-county/tax-parcels-2022/parcels.shp</SrcDataSource>
+    </OGRVRTLayer>
+
+    <!-- Link to the SQLite database -->
+    <OGRVRTLayer name="cannabis_registry">
+        <SrcDataSource>cannabis-parcels/cannabis-registry.sqlite</SrcDataSource>
+        <SrcLayer>cannabis_registry</SrcLayer>
+    </OGRVRTLayer>
+</OGRVRTDataSource>
