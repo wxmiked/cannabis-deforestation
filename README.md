@@ -26,8 +26,39 @@ The Calaveras County Planning Department provided a PDF version of a spreadsheet
 
 The parcel numbers were extracted to a CSV from the PDF using the following command:
 ```
-pdftotext -layout -nopgbrk data-to-import/calaveras-county/public-record-cannabis-cultivation-database-2018-02.pdf - | grep COMMERCIAL | gsed -e 's#.*\([0-9]\{8\}\).*#\1#g' | egrep '^[0-9]{8}' > cannabis-parcels/cannabis-registry-2018-commercial-apns.csv
+echo apn > cannabis-parcels/cannabis-registry-2018-commercial-apns.csv
+pdftotext -layout -nopgbrk data-to-import/calaveras-county/public-record-cannabis-cultivation-database-2018-02.pdf - | grep COMMERCIAL | gsed -e 's#.*\([0-9]\{8\}\).*#\1#g' | egrep '^[0-9]{8}' >> cannabis-parcels/cannabis-registry-2018-commercial-apns.csv
 ```
 
 ### Using the cannabis cultivation sites parcel numbers to extract GIS data
 
+The parcel numbers were then used to extract the GIS data from the Calaveras County Parcel GIS data.
+
+Steps:
+1. Create a SQLite database to store the cannabis cultivation sites parcel numbers.
+    ```
+    ogr2ogr -f "SQLite" cannabis-parcels/cannabis-registry.sqlite cannabis-parcels/cannabis-registry-2018-commercial-apns.csv -nln cannabis_registry
+    ```
+2. Create a [VRT file](https://gdal.org/drivers/vector/vrt.html
+) to extract the GIS data from the Calaveras County Parcel GIS data. See [parcels.vrt](parcels.vrt) for the VRT file used.
+3. Run the OGR command to extract the GIS data from the Calaveras County Parcel GIS data.
+    ```
+    ogr2ogr -f "ESRI Shapefile" cannabis-parcels/cannabis-registry-2018-commercial-apns.shp \
+    cannabis-parcels/parcels.vrt \
+    -sql "SELECT p.* FROM parcels p JOIN cannabis_registry c ON p.APN = c.apn" \
+    -dialect SQLite
+    ```
+4. Create a Shapefile of the non-cannabis parcels.
+    ```
+    ogr2ogr -f "ESRI Shapefile" cannabis-parcels/non-cannabis-parcels.shp \
+    cannabis-parcels/parcels.vrt \
+    -sql "SELECT p.* FROM parcels p WHERE p.APN NOT IN (SELECT apn FROM cannabis_registry)" \
+    -dialect SQLite
+    ```
+
+### Using the cannabis cultivation sites parcel numbers to extract NAIP imagery
+
+The parcel numbers were then used to extract the NAIP imagery from the Calaveras County Parcel GIS data.
+
+Steps:
+1. Create a VRT file to extract the NAIP imagery from the Calaveras County Parcel GIS data. See [naip.vrt](naip.vrt) for the VRT file used.
