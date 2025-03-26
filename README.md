@@ -40,7 +40,7 @@ Steps:
     ogr2ogr -f "SQLite" cannabis-parcels/cannabis-registry.sqlite cannabis-parcels/cannabis-registry-2018-commercial-apns.csv -nln cannabis_registry
     ```
 2. Create a [VRT file](https://gdal.org/drivers/vector/vrt.html
-) to extract the GIS data from the Calaveras County Parcel GIS data. See [parcels.vrt](parcels.vrt) for the VRT file used.
+) to extract the GIS data from the Calaveras County Parcel GIS data. See [parcels.vrt](./cannabis-parcels/parcels.vrt) for the VRT file used.
 3. Run the OGR command to extract the GIS data from the Calaveras County Parcel GIS data.
     ```
     ogr2ogr -f "ESRI Shapefile" cannabis-parcels/cannabis-registry-2018-commercial-apns.shp \
@@ -61,4 +61,4 @@ Steps:
 The parcel numbers were then used to extract the NAIP imagery from the Calaveras County Parcel GIS data.
 
 Steps:
-1. Create a VRT file to extract the NAIP imagery from the Calaveras County Parcel GIS data. See [naip.vrt](./cannabis-parcels/naip.vrt) for the VRT file used.
+1. Create a VRT file to extract the NAIP imagery from the Calaveras County Parcel GIS data. See [parcels.vrt](./cannabis-parcels/parcels.vrt) for the VRT file used.
