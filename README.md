@@ -61,4 +61,4 @@ Steps:
 The parcel numbers were then used to extract the NAIP imagery from the Calaveras County Parcel GIS data.
 
 Steps:
-1. Create a VRT file to extract the NAIP imagery from the Calaveras County Parcel GIS data. See [naip.vrt](naip.vrt) for the VRT file used.
+1. Create a VRT file to extract the NAIP imagery from the Calaveras County Parcel GIS data. See [naip.vrt](./cannabis-parcels/naip.vrt) for the VRT file used.
