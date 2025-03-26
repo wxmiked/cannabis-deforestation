@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The cultivation of cannabis has been linked to deforestation, particularly in regions where illegal or unregulated farming practices prevail. This repository aims to investigate the environmental impact of cannabis cultivation on forested areas, with a focus on analyzing data from sources such as the National Agriculture Imagery Program (NAIP) and records from Calaveras County. By leveraging geospatial imagery and public records, we seek to identify patterns and assess the extent to which cannabis farming contributes to deforestation. Our goal is to provide insights that can inform sustainable agricultural practices and policy decisions.
+The cultivation of cannabis has been linked to deforestation, particularly in regions where illegal or unregulated farming practices prevail. This repository aims to investigate the environmental impact of cannabis cultivation on forested areas, with a focus on analyzing data from sources such as the National Agriculture Imagery Program (NAIP) and records from Calaveras County. By leveraging geospatial imagery and public records, we seek to identify patterns and assess the extent to which cannabis farming contributes to deforestation. Our goal is to provide insights that can inform sustainable agricultural practices and policy decisions in California and beyond.
 
 This repository is a work in progress. See the [wiki](https://github.com/wxmiked/cannabis-deforestation/wiki) for more information.
 
