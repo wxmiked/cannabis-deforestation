@@ -112,7 +112,7 @@
       "label": "cannabis",
       "points": [
         [
-          247.0,
+          247,
           155.73684210526315
         ],
         [
@@ -139,6 +139,7 @@
       "mask": null
     }
   ],
+  "imageData": null,
   "imagePath": "12012118_20160620.tif",
   "imageHeight": 322,
   "imageWidth": 594
