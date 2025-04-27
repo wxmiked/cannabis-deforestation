@@ -27,9 +27,36 @@
       "shape_type": "polygon",
       "flags": {},
       "mask": null
+    },
+    {
+      "label": "cannabis - old",
+      "points": [
+        [
+          65.8133514986376,
+          102.34196185286103
+        ],
+        [
+          105.86784741144415,
+          138.0367847411444
+        ],
+        [
+          101.78065395095366,
+          72.3692098092643
+        ],
+        [
+          87.88419618528609,
+          79.99863760217984
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "shape_type": "polygon",
+      "flags": {},
+      "mask": null
     }
   ],
   "imagePath": "14024005_20160620.tif",
+  "imageData": null,
   "imageHeight": 257,
   "imageWidth": 221
 }

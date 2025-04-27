@@ -1,0 +1,36 @@
+{
+  "version": "5.8.1",
+  "flags": {},
+  "shapes": [
+    {
+      "label": "hoop house",
+      "points": [
+        [
+          77.49236641221374,
+          71.10687022900764
+        ],
+        [
+          90.27862595419846,
+          148.206106870229
+        ],
+        [
+          124.6297709923664,
+          141.5267175572519
+        ],
+        [
+          108.59923664122137,
+          66.14503816793894
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "shape_type": "polygon",
+      "flags": {},
+      "mask": null
+    }
+  ],
+  "imagePath": "14030029_20160620.tif",
+  "imageData": null,
+  "imageHeight": 180,
+  "imageWidth": 163
+}

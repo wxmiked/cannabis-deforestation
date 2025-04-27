@@ -10,7 +10,7 @@
           45.51706484641638
         ],
         [
-          9.0,
+          9,
           39.88566552901024
         ],
         [
@@ -65,6 +65,7 @@
       "mask": null
     }
   ],
+  "imageData": null,
   "imagePath": "12003015_20160620.tif",
   "imageHeight": 161,
   "imageWidth": 168
