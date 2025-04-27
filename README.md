@@ -1,4 +1,6 @@
-# cannabis-deforestation
+# Cannabis Deforestation Dataset
+
+This package provides datasets for analyzing cannabis cultivation's impact on deforestation using geospatial data from Calaveras County, California.
 
 ## Introduction
 
@@ -43,16 +45,9 @@ Steps:
 ) to extract the GIS data from the Calaveras County Parcel GIS data. See [parcels.vrt](./cannabis-parcels/parcels.vrt) for the VRT file used.
 3. Run the OGR command to extract the GIS data from the Calaveras County Parcel GIS data.
     ```
-    ogr2ogr -f "ESRI Shapefile" cannabis-parcels/cannabis-registry-2018-commercial-apns.shp \
+    ogr2ogr -f "GPKG" cannabis-parcels/cannabis-registry-2018-commercial-permits-parcels.gpkg \
     cannabis-parcels/parcels.vrt \
-    -sql "SELECT p.* FROM parcels p JOIN cannabis_registry c ON p.APN = c.apn" \
-    -dialect SQLite
-    ```
-4. Create a Shapefile of the non-cannabis parcels.
-    ```
-    ogr2ogr -f "ESRI Shapefile" cannabis-parcels/non-cannabis-parcels.shp \
-    cannabis-parcels/parcels.vrt \
-    -sql "SELECT p.* FROM parcels p WHERE p.APN NOT IN (SELECT apn FROM cannabis_registry)" \
+    -sql "SELECT p.*, CASE WHEN c.apn IS NOT NULL THEN 1 ELSE 0 END AS cannabis_permit FROM parcels p LEFT JOIN cannabis_registry c ON p.APN = c.apn" \
     -dialect SQLite
     ```
 
