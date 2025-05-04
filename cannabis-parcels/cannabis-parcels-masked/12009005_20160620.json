@@ -89,10 +89,40 @@
       "shape_type": "polygon",
       "flags": {},
       "mask": null
+    },
+    {
+      "label": "cannabis",
+      "points": [
+        [
+          276.62820512820514,
+          397.38461538461536
+        ],
+        [
+          275.60256410256414,
+          414.8205128205128
+        ],
+        [
+          292.01282051282055,
+          431.2307692307692
+        ],
+        [
+          311.5,
+          427.64102564102564
+        ],
+        [
+          283.2948717948718,
+          396.87179487179486
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "shape_type": "polygon",
+      "flags": {},
+      "mask": null
     }
   ],
-  "imageData": null,
   "imagePath": "12009005_20160620.tif",
+  "imageData": null,  
   "imageHeight": 484,
   "imageWidth": 343
 }
