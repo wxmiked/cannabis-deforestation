@@ -1,0 +1,36 @@
+{
+  "version": "5.8.1",
+  "flags": {},
+  "shapes": [
+    {
+      "label": "cannabis",
+      "points": [
+        [
+          260.6058020477816,
+          180.39078498293514
+        ],
+        [
+          297.1245733788396,
+          199.8447098976109
+        ],
+        [
+          339.4453924914676,
+          173.56484641638224
+        ],
+        [
+          331.9368600682594,
+          132.95051194539246
+        ]
+      ],
+      "group_id": null,
+      "description": "",
+      "shape_type": "polygon",
+      "flags": {},
+      "mask": null
+    }
+  ],
+  "imagePath": "20014014_20160620.tif",
+  "imageData": null,
+  "imageHeight": 313,
+  "imageWidth": 455
+}
