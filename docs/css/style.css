@@ -1,0 +1,387 @@
+/* ===== Reset & Base ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Merriweather', Georgia, serif;
+    color: #2c2c2c;
+    background: #fafaf8;
+    line-height: 1.7;
+}
+
+a {
+    color: #1a7a6d;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ===== Header ===== */
+.site-header {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #1b1b2f 0%, #1b3a4b 50%, #2d6a4f 100%);
+    color: #fff;
+    overflow: hidden;
+}
+
+.site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="g" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.5" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect fill="url(%23g)" width="100" height="100"/></svg>');
+    pointer-events: none;
+}
+
+.header-content {
+    position: relative;
+    max-width: 800px;
+    z-index: 1;
+}
+
+.site-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+}
+
+.site-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 1.5rem;
+}
+
+.byline {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.byline a {
+    color: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.byline a:hover {
+    color: #fff;
+    text-decoration: none;
+    border-bottom-color: #fff;
+}
+
+.separator {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    z-index: 1;
+}
+
+.scroll-arrow {
+    font-size: 1.5rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(8px); }
+    60% { transform: translateY(4px); }
+}
+
+/* ===== Scrollytelling Layout ===== */
+#scrolly {
+    position: relative;
+    display: flex;
+}
+
+#map-container {
+    position: sticky;
+    top: 0;
+    width: 55%;
+    height: 100vh;
+    z-index: 1;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+#map-overlay-info {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+#current-year-label {
+    display: none;
+    background: rgba(27, 27, 47, 0.85);
+    color: #ffd54f;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
+
+#current-year-label.visible {
+    display: inline-block;
+}
+
+/* ===== Compare Slider ===== */
+.compare-slider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #fff;
+    z-index: 1000;
+    cursor: ew-resize;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    transform: translateX(-2px);
+}
+
+.compare-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.compare-grip {
+    width: 32px;
+    height: 48px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #666;
+    letter-spacing: 2px;
+    pointer-events: auto;
+    cursor: ew-resize;
+}
+
+.compare-label-left,
+.compare-label-right {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(27, 27, 47, 0.85);
+    padding: 3px 8px;
+    border-radius: 3px;
+    pointer-events: none;
+}
+
+.compare-label-left {
+    margin-right: 4px;
+}
+
+.compare-label-right {
+    margin-left: 4px;
+}
+
+.story {
+    position: relative;
+    width: 45%;
+    padding: 0;
+    z-index: 2;
+}
+
+.step {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    padding: 2rem;
+}
+
+.step:first-child {
+    padding-top: 15vh;
+}
+
+.step:last-child {
+    padding-bottom: 40vh;
+}
+
+.step-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #1b3a4b;
+    max-width: 520px;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.step.is-active .step-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.step:not(.is-active) .step-content {
+    opacity: 0.3;
+    transform: translateY(10px);
+}
+
+.step-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1b3a4b;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.step-content p {
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+    color: #3a3a3a;
+}
+
+.step-content p:last-child {
+    margin-bottom: 0;
+}
+
+.step-content ul {
+    margin: 0.5rem 0 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    color: #3a3a3a;
+}
+
+.step-content ul li {
+    margin-bottom: 0.4rem;
+}
+
+.step-content .data-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #666;
+    padding: 0.6rem 0.8rem;
+    background: #f5f5f0;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+}
+
+.step-content a {
+    color: #1a7a6d;
+    font-weight: 500;
+}
+
+/* ===== Map Controls ===== */
+.leaflet-control-layers {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+}
+
+.year-control {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+}
+
+.year-control label {
+    display: block;
+    margin: 4px 0;
+    cursor: pointer;
+}
+
+.year-control input[type="radio"],
+.year-control input[type="checkbox"] {
+    margin-right: 6px;
+}
+
+/* ===== Footer ===== */
+.site-footer {
+    background: #1b1b2f;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 2rem;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+}
+
+.site-footer a {
+    color: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.site-footer a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.site-footer p + p {
+    margin-top: 0.5rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+    #scrolly {
+        flex-direction: column;
+    }
+
+    #map-container {
+        width: 100%;
+        height: 50vh;
+        position: sticky;
+        top: 0;
+    }
+
+    .story {
+        width: 100%;
+        padding: 0 1rem;
+    }
+
+    .step {
+        min-height: 60vh;
+        padding: 1.5rem 1rem;
+    }
+
+    .step-content {
+        max-width: 100%;
+        padding: 1.5rem;
+    }
+}

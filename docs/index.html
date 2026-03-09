@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Cannabis Boom of Calaveras County</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Scrollama -->
+    <script src="https://unpkg.com/scrollama@3.2.0/build/scrollama.min.js"></script>
+
+    <!-- Intersection Observer polyfill -->
+    <script src="https://unpkg.com/intersection-observer@0.12.2/intersection-observer.js"></script>
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="site-header">
+        <div class="header-content">
+            <h1 class="site-title">The Cannabis Boom of Calaveras County</h1>
+            <p class="site-subtitle">How a rural California county's experiment with cannabis legalization reshaped the landscape — told through satellite imagery and public records</p>
+            <div class="byline">
+                <span class="author">By Mike D.</span>
+                <span class="separator">·</span>
+                <span class="date">March 2025</span>
+                <span class="separator">·</span>
+                <span class="contact"><a href="https://github.com/wxmiked/cannabis-deforestation">GitHub</a></span>
+            </div>
+        </div>
+        <div class="scroll-hint">
+            <span>Scroll to explore</span>
+            <div class="scroll-arrow">↓</div>
+        </div>
+    </header>
+
+    <!-- ===== SCROLLYTELLING SECTIONS ===== -->
+    <main>
+        <section id="scrolly">
+            <div id="map-container">
+                <div id="map"></div>
+                <div id="map-overlay-info">
+                    <span id="current-year-label"></span>
+                </div>
+            </div>
+
+            <div class="story" id="story">
+
+                <!-- SECTION 1: Introduction -->
+                <div class="step" data-step="intro" data-center="38.19,-120.65" data-zoom="10">
+                    <div class="step-content">
+                        <h2>Calaveras County, California</h2>
+                        <p>Nestled in the Sierra Nevada foothills, Calaveras County is known for its Gold Rush history, giant sequoias, and Mark Twain's celebrated jumping frog. But starting in 2016, it became the center of a different kind of story.</p>
+                        <p>When California legalized recreational cannabis with <strong>Proposition 64</strong>, Calaveras County introduced an Urgency Ordinance to regulate and tax cultivation — setting off a land rush that would transform the county's landscape.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Before -->
+                <div class="step" data-step="before-2014" data-center="38.19,-120.55" data-zoom="13" data-layers="naip-2014,parcels">
+                    <div class="step-content">
+                        <h2>Before the Boom: 2014</h2>
+                        <p>In 2014 NAIP imagery, many of the parcels that would later be registered for cannabis cultivation show <strong>dense forest cover</strong> — oaks, pines, and mixed conifer typical of the Sierra foothills.</p>
+                        <p>Some parcels already show signs of small-scale clearing, but the landscape is largely undisturbed.</p>
+                        <p class="data-note">🟦 Blue outlines show the 712 parcels that would later apply for cannabis cultivation permits.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Peak Cultivation -->
+                <div class="step" data-step="peak-2016" data-center="38.19,-120.55" data-zoom="13" data-layers="naip-2016,parcels">
+                    <div class="step-content">
+                        <h2>The Boom: 2016</h2>
+                        <p>By 2016, the impact is unmistakable. NAIP imagery reveals <strong>widespread clearing</strong> within cannabis-permitted parcels — bare earth, access roads, hoop houses, and cultivation rows.</p>
+                        <p>The county's Urgency Ordinance required applicants to already be growing cannabis before applying, which <strong>incentivized rapid clearing</strong> of forested land to establish operations before the permit deadline.</p>
+                        <p>At the peak, approximately <strong>1,600 parcels</strong> had applied for or received cultivation permits.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: After the Ban -->
+                <div class="step" data-step="after-2018" data-center="38.19,-120.55" data-zoom="13" data-layers="naip-2018,parcels">
+                    <div class="step-content">
+                        <h2>After the Ban: 2018</h2>
+                        <p>In 2018, the Board of Supervisors <strong>banned all commercial cannabis cultivation</strong>, making previously permitted sites illegal. The 2018 NAIP imagery tells a mixed story:</p>
+                        <ul>
+                            <li>Some sites show signs of <strong>abandonment</strong> — regrowth beginning to reclaim cleared areas</li>
+                            <li>Other sites show <strong>continued or expanded clearing</strong>, suggesting illegal cultivation persisted</li>
+                            <li>The environmental damage — deforestation, soil disturbance, altered drainage — remained visible</li>
+                        </ul>
+                        <p>By 2022, only <strong>65 licensed cultivation sites</strong> remained, but illegal operations far exceeded this number.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: Compare -->
+                <div class="step" data-step="compare" data-center="38.19,-120.55" data-zoom="14" data-layers="naip-2014,naip-2018,parcels" data-compare="true">
+                    <div class="step-content">
+                        <h2>See the Change</h2>
+                        <p>Use the <strong>slider</strong> on the map to compare 2014 (left) and 2018 (right) imagery side by side. Drag it left and right to reveal the extent of clearing.</p>
+                        <p>The contrast is stark on many parcels — dense forest replaced by bare earth, structures, and cultivation infrastructure.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 6: The Data -->
+                <div class="step" data-step="data" data-center="38.19,-120.55" data-zoom="12" data-layers="parcels,detections">
+                    <div class="step-content">
+                        <h2>Mapping the Invisible</h2>
+                        <p>This map was built using data that was never meant to be a map. Through a <strong>California Public Records Act</strong> request, we obtained the Calaveras County Planning Department's spreadsheet of all parcels that applied for cannabis cultivation permits under the 2016 Urgency Ordinance.</p>
+                        <p>We extracted <strong>712 parcel numbers (APNs)</strong> from the PDF using text processing, then joined them against the county's GIS parcel boundaries to create a spatial dataset of cannabis cultivation sites.</p>
+                        <p class="data-note">🔴 Red polygons show 2016 detected cannabis farms, identified via ML semantic segmentation of NAIP imagery.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 7: ML Detection -->
+                <div class="step" data-step="ml" data-center="38.34,-120.52" data-zoom="15" data-layers="naip-2016,detections">
+                    <div class="step-content">
+                        <h2>Teaching Machines to See Cannabis Farms</h2>
+                        <p>We trained a <strong>semantic segmentation model</strong> (U-Net with ResNet-50 backbone) on manually annotated 2016 NAIP imagery to detect cannabis cultivation sites from satellite imagery.</p>
+                        <p>The <strong>red polygons</strong> on the map are 2016 detected cannabis farms. The model identifies characteristic patterns: cleared forest patches, organized rows, hoop house structures, and access roads within the parcels.</p>
+                        <p>Current limitations include false positives on vineyards and orchards. Multi-temporal training across 2014, 2016, and 2018 is a next step.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 8: Environmental Impact -->
+                <div class="step" data-step="environment" data-center="38.19,-120.55" data-zoom="11" data-layers="parcels">
+                    <div class="step-content">
+                        <h2>Environmental Impact</h2>
+                        <p>According to the <strong>2023 Calaveras County Civil Grand Jury Report</strong>, illegal cannabis cultivation has significantly impacted the environment:</p>
+                        <ul>
+                            <li><strong>Deforestation</strong> of native oak woodland and mixed conifer forest</li>
+                            <li><strong>Soil contamination</strong> from pesticides and fertilizers</li>
+                            <li><strong>Water contamination</strong> and overuse of groundwater</li>
+                            <li><strong>Habitat fragmentation</strong> affecting wildlife corridors</li>
+                        </ul>
+                        <p>Environmental damage often went unaddressed due to limited coordination among county agencies, insufficient resources, and weak penalties.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 9: Methodology -->
+                <div class="step" data-step="methodology" data-center="38.19,-120.55" data-zoom="11" data-layers="parcels">
+                    <div class="step-content">
+                        <h2>How This Was Made</h2>
+                        <p><strong>Data sources:</strong></p>
+                        <ul>
+                            <li>NAIP aerial imagery (2014, 2016, 2018) via USDA/Microsoft Planetary Computer</li>
+                            <li>Cannabis permit records via California Public Records Act</li>
+                            <li>County parcel GIS data (2022)</li>
+                            <li>2023 Civil Grand Jury Report</li>
+                        </ul>
+                        <p><strong>Tools:</strong> Python, GDAL, Leaflet.js, TorchGeo, LabelMe</p>
+                        <p><strong>Code:</strong> <a href="https://github.com/wxmiked/cannabis-deforestation" target="_blank">github.com/wxmiked/cannabis-deforestation</a></p>
+                    </div>
+                </div>
+
+                <!-- SECTION 10: Conclusion -->
+                <div class="step" data-step="conclusion" data-center="38.19,-120.65" data-zoom="10" data-layers="parcels">
+                    <div class="step-content">
+                        <h2>Looking Forward</h2>
+                        <p>Calaveras County's cannabis story is a cautionary tale about the unintended consequences of rapid legalization without adequate environmental safeguards.</p>
+                        <p>Satellite imagery provides a powerful, objective record of land use change that persists long after political debates have moved on. By combining public records with remote sensing, we can quantify environmental impacts that might otherwise go unmeasured.</p>
+                        <p>This project is ongoing. We plan to extend the analysis to additional years and neighboring counties.</p>
+                    </div>
+                </div>
+
+            </div><!-- .story -->
+        </section><!-- #scrolly -->
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>Built with <a href="https://leafletjs.com" target="_blank">Leaflet</a> · Data from USDA NAIP &amp; Calaveras County Public Records</p>
+            <p><a href="https://github.com/wxmiked/cannabis-deforestation" target="_blank">View source on GitHub</a></p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
