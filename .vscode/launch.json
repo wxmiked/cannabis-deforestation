@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Serve Blog Interactive (Python)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/blog-interactive/serve.py",
+      "cwd": "${workspaceFolder}/blog-interactive",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # Cannabis Deforestation Dataset
 
+Interactive blog (GitHub Pages): https://wxmiked.github.io/cannabis-deforestation/
+
 This package provides datasets for analyzing cannabis cultivation's impact on deforestation using geospatial data from Calaveras County, California.
 
 ## Introduction
@@ -45,11 +47,14 @@ Steps:
 ) to extract the GIS data from the Calaveras County Parcel GIS data. See [parcels.vrt](./cannabis-parcels/parcels.vrt) for the VRT file used.
 3. Run the OGR command to extract the GIS data from the Calaveras County Parcel GIS data.
     ```
+    # Only extract parcels with cannabis permits (reduces file size from ~200MB to ~3MB)
     ogr2ogr -f "GPKG" cannabis-parcels/cannabis-registry-2018-commercial-permits-parcels.gpkg \
     cannabis-parcels/parcels.vrt \
-    -sql "SELECT p.*, CASE WHEN c.apn IS NOT NULL THEN 1 ELSE 0 END AS cannabis_permit FROM parcels p LEFT JOIN cannabis_registry c ON p.APN = c.apn" \
+    -sql "SELECT p.* FROM parcels p INNER JOIN cannabis_registry c ON p.APN = c.apn" \
     -dialect SQLite
     ```
+    
+    **Note:** The original command used `LEFT JOIN` which included all 43,476 county parcels. Using `INNER JOIN` filters to only the ~712 parcels with cannabis permits, reducing file size by ~98%.
 
 ### Using the cannabis cultivation sites parcel numbers to extract NAIP imagery
 
@@ -57,3 +62,59 @@ The parcel numbers were then used to extract the NAIP imagery from the Calaveras
 
 Steps:
 1. Create a VRT file to extract the NAIP imagery from the Calaveras County Parcel GIS data. See [parcels.vrt](./cannabis-parcels/parcels.vrt) for the VRT file used.
+
+### Annotating training data with LabelMe
+
+After extracting NAIP imagery tiles from permitted parcels, the images were manually annotated using [LabelMe](https://github.com/wkentaro/labelme) to create ground truth labels for training the semantic segmentation model.
+
+#### Installing LabelMe
+
+```bash
+pip install labelme
+```
+
+#### Annotation workflow
+
+1. **Launch LabelMe** with the directory containing extracted NAIP tiles:
+   ```bash
+   labelme cannabis-parcels/cannabis-parcels-masked/
+   ```
+
+2. **Create polygon annotations** by clicking points around cultivation sites. LabelMe will save a JSON file for each annotated image.
+
+3. **Use the following labels**:
+   - `cannabis` - Open-air cannabis cultivation sites (rows of plants, cleared areas with visible cultivation)
+   - `hoop house - old` - Greenhouse/hoop house structures used for cultivation
+   - `cannabis - old` - Abandoned or inactive cultivation sites (excluded from training)
+
+4. **Annotation tips**:
+   - Draw tight polygons around visible cultivation areas
+   - Include multiple polygons per image if there are multiple distinct grow sites
+   - Be consistent with polygon boundaries
+   - Skip images with no visible cultivation (these become negative examples)
+
+#### Output format
+
+LabelMe creates a JSON file for each annotated image containing:
+- Polygon coordinates in pixel space
+- Label names
+- Image metadata (filename, dimensions)
+
+Example structure:
+```json
+{
+  "version": "5.8.1",
+  "shapes": [
+    {
+      "label": "cannabis",
+      "points": [[x1, y1], [x2, y2], ...],
+      "shape_type": "polygon"
+    }
+  ],
+  "imagePath": "10019035_20160620.tif",
+  "imageHeight": 1133,
+  "imageWidth": 979
+}
+```
+
+The training code in `notebooks/cannabis-segmentation-torchgeo.ipynb` reads these JSON files and converts the pixel-space polygons to georeferenced masks using the image's geospatial transform.

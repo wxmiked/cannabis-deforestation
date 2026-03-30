@@ -1,0 +1,69 @@
+name: Blog interactive smoke check
+
+on:
+  pull_request:
+    paths:
+      - "blog-interactive/**"
+      - ".github/workflows/blog-interactive-smoke-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify required files
+        run: |
+          test -f blog-interactive/index.html
+          test -f blog-interactive/css/style.css
+          test -f blog-interactive/js/app.js
+          test -f blog-interactive/js/county_boundary.js
+
+      - name: Validate local asset references
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          missing=0
+          while IFS= read -r asset; do
+            cleaned="${asset%%\?*}"
+
+            if [[ "$cleaned" =~ ^(https?:|data:|mailto:|#) ]]; then
+              continue
+            fi
+
+            if [[ ! -e "blog-interactive/$cleaned" ]]; then
+              echo "::error file=blog-interactive/index.html::Missing local asset: $cleaned"
+              missing=1
+            fi
+          done < <(
+            grep -oE '(src|href)="[^"]+"' blog-interactive/index.html \
+              | sed -E 's/^(src|href)="([^"]+)"$/\2/'
+          )
+
+          if [[ "$missing" -ne 0 ]]; then
+            exit 1
+          fi
+
+      - name: Serve and fetch homepage
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 -m http.server 8081 --directory blog-interactive &
+          server_pid=$!
+
+          cleanup() {
+            kill "$server_pid"
+          }
+          trap cleanup EXIT
+
+          sleep 2
+          curl -fsS http://127.0.0.1:8081/ > /tmp/blog-home.html
+          grep -q "The Cannabis Boom of Calaveras County" /tmp/blog-home.html
