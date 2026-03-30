@@ -1,5 +1,7 @@
 # Cannabis Deforestation Dataset
 
+Interactive blog (GitHub Pages): https://wxmiked.github.io/cannabis-deforestation/
+
 This package provides datasets for analyzing cannabis cultivation's impact on deforestation using geospatial data from Calaveras County, California.
 
 ## Introduction
