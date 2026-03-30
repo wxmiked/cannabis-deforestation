@@ -193,7 +193,6 @@ a:hover {
     max-height: min(80vh, 760px);
     overflow: hidden;
 }
-
 .after-ban-media-figure {
     position: relative;
     width: min(94%, 1120px);
