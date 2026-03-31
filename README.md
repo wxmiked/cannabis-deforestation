@@ -118,3 +118,17 @@ Example structure:
 ```
 
 The training code in `notebooks/cannabis-segmentation-torchgeo.ipynb` reads these JSON files and converts the pixel-space polygons to georeferenced masks using the image's geospatial transform.
+
+## Model Weights
+
+The trained segmentation model weights are archived on Zenodo with a citable DOI:
+
+**[cannabis-cultivation-segmentation-v1](https://doi.org/10.5281/zenodo.19343763)**  
+`https://doi.org/10.5281/zenodo.19343763`
+
+The Zenodo record includes the model weights (`cannabis-cultivation-deeplabv3plus-resnet50-naip.pth`) and full documentation. See [`models/README.md`](models/README.md) for download and usage instructions.
+
+## License
+
+Code: [MIT License](LICENSE)  
+Model weights: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
