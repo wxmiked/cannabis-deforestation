@@ -644,6 +644,33 @@ a:hover {
 }
 
 /* ===== Responsive ===== */
+
+/* Tablet landscape / narrow desktop: tighten the side-by-side layout */
+@media (max-width: 1200px) {
+    #map-container {
+        width: 50%;
+    }
+
+    .story {
+        width: 50%;
+    }
+
+    .step-content {
+        max-width: 100%;
+        padding: 1.75rem 2rem;
+    }
+
+    .step-content h2 {
+        font-size: 1.3rem;
+    }
+
+    .step-content p,
+    .step-content ul {
+        font-size: 0.9rem;
+    }
+}
+
+/* Tablet portrait / phablet: switch to stacked layout */
 @media (max-width: 900px) {
     #scrolly {
         flex-direction: column;
@@ -669,5 +696,63 @@ a:hover {
     .step-content {
         max-width: 100%;
         padding: 1.5rem;
+    }
+
+    /* Scale down media panels in stacked mode */
+    .environment-media-figure,
+    .after-ban-media-figure,
+    .conclusion-media-figure {
+        width: 100%;
+    }
+
+    .environment-media-figure img,
+    .after-ban-media-figure img,
+    .conclusion-slideshow {
+        height: 42vh;
+        max-height: none;
+    }
+
+    .conclusion-media-figure img {
+        position: relative;
+        inset: auto;
+        height: 42vh;
+    }
+}
+
+/* Mobile: tighten further */
+@media (max-width: 600px) {
+    .site-title {
+        font-size: 1.6rem;
+    }
+
+    .site-subtitle {
+        font-size: 0.95rem;
+    }
+
+    #map-container {
+        height: 45vh;
+    }
+
+    .step {
+        min-height: 50vh;
+        padding: 1.25rem 0.75rem;
+    }
+
+    .step-content {
+        padding: 1.25rem;
+        border-left-width: 3px;
+    }
+
+    .step-content h2 {
+        font-size: 1.2rem;
+    }
+
+    .step-content p,
+    .step-content ul {
+        font-size: 0.875rem;
+    }
+
+    .byline {
+        font-size: 0.8rem;
     }
 }
