@@ -904,10 +904,15 @@
     function initScrollama() {
         var scroller = scrollama();
 
+        // On mobile (stacked layout), the map occupies the top ~55vh and story
+        // cards sit below it. Use a lower offset so steps trigger when the top
+        // of the card enters the viewport rather than waiting for the midpoint.
+        var scrollamaOffset = window.innerWidth <= 900 ? 0.85 : 0.5;
+
         scroller
             .setup({
                 step: '.step',
-                offset: 0.5,
+                offset: scrollamaOffset,
                 progress: false,
                 debug: false
             })
