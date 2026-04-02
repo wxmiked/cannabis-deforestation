@@ -483,11 +483,31 @@
             });
         });
 
-        // Once all mosaics are registered, add layer control
+        // Once all mosaics are registered, add layer control and re-apply
+        // the current step's layers in case the user scrolled to a NAIP step
+        // before registration completed.
         Promise.all(promises).then(function () {
             refreshLayerControl();
-
             console.log('All NAIP mosaic layers ready');
+
+            // Re-apply layers for the active step if it uses NAIP
+            var activeStepEl = document.querySelector('.step.is-active');
+            if (activeStepEl) {
+                var layerStr = activeStepEl.getAttribute('data-layers');
+                if (layerStr && layerStr.indexOf('naip-') !== -1) {
+                    var layerNames = layerStr.split(',').map(function (n) { return n.trim(); });
+                    setVisibleLayers(layerNames);
+                    // Re-enable compare if needed
+                    var isCompare = activeStepEl.getAttribute('data-compare') === 'true';
+                    if (isCompare) {
+                        var compareLeft = activeStepEl.getAttribute('data-compare-left') || 'naip-2014';
+                        var compareRight = activeStepEl.getAttribute('data-compare-right') || 'naip-2018';
+                        var compareLeftLabel = activeStepEl.getAttribute('data-compare-left-label');
+                        var compareRightLabel = activeStepEl.getAttribute('data-compare-right-label');
+                        enableCompare(compareLeft, compareRight, compareLeftLabel, compareRightLabel);
+                    }
+                }
+            }
         });
     }
 
