@@ -678,7 +678,7 @@ a:hover {
 
     #map-container {
         width: 100%;
-        height: 50vh;
+        height: 55vh;
         position: sticky;
         top: 0;
     }
@@ -689,13 +689,21 @@ a:hover {
     }
 
     .step {
-        min-height: 60vh;
+        min-height: 40vh;
         padding: 1.5rem 1rem;
+    }
+
+    .step:first-child {
+        padding-top: 5vh;
+    }
+
+    .step:last-child {
+        padding-bottom: 20vh;
     }
 
     .step-content {
         max-width: 100%;
-        padding: 1.5rem;
+        padding: 1.25rem;
     }
 
     /* Scale down media panels in stacked mode */
