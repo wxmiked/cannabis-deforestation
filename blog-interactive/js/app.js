@@ -699,7 +699,7 @@
         // Reset clip on all NAIP panes
         ['naip-2014', 'naip-2016', 'naip-2018'].forEach(function (paneName) {
             var pane = map.getPane(paneName);
-            if (pane) pane.style.clip = '';
+            if (pane) { pane.style.clip = ''; pane.style.clipPath = ''; }
         });
     }
 
@@ -750,15 +750,19 @@
             var splitX = Math.round(w * sliderPos);
 
             // Compute clip in pane-local coords by compensating for pane transform
+            // Use clip-path: inset() — modern, Firefox-compatible replacement for
+            // the deprecated clip: rect() which Firefox has dropped.
             var leftRect = leftPane.getBoundingClientRect();
             var ldx = mapRect.left - leftRect.left;
             var ldy = mapRect.top  - leftRect.top;
-            leftPane.style.clip = 'rect(' + ldy + 'px, ' + (splitX + ldx) + 'px, ' + (h + ldy) + 'px, ' + ldx + 'px)';
+            var leftRight = leftRect.width - (splitX + ldx);
+            leftPane.style.clipPath = 'inset(' + ldy + 'px ' + leftRight + 'px ' + '0px ' + ldx + 'px)';
 
             var rightRect = rightPane.getBoundingClientRect();
             var rdx = mapRect.left - rightRect.left;
             var rdy = mapRect.top  - rightRect.top;
-            rightPane.style.clip = 'rect(' + rdy + 'px, ' + (w + rdx) + 'px, ' + (h + rdy) + 'px, ' + (splitX + rdx) + 'px)';
+            var rightLeft = splitX + rdx;
+            rightPane.style.clipPath = 'inset(' + rdy + 'px 0px 0px ' + rightLeft + 'px)';
 
             compareSliderEl.style.left = splitX + 'px';
         };
