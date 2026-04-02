@@ -700,7 +700,7 @@
         // Reset clip on all NAIP panes
         ['naip-2014', 'naip-2016', 'naip-2018'].forEach(function (paneName) {
             var pane = map.getPane(paneName);
-            if (pane) { pane.style.clipPath = ''; }
+            if (pane) { pane.style.clip = ''; pane.style.clipPath = ''; }
         });
     }
 
@@ -750,24 +750,19 @@
             var h = mapRect.height;
             var splitX = Math.round(w * sliderPos);
 
-            // Use clip-path: polygon() with percentage values.
-            // Percentages are relative to the element's own dimensions (pre-transform),
-            // so this works correctly regardless of Leaflet's CSS transform offsets.
-            // clip: rect() was deprecated and dropped by Firefox; inset() has coordinate
-            // space issues with transformed elements.
+            // clip: rect() works on position:absolute elements (which Leaflet panes are).
+            // We set both clip (legacy) and clip-path (modern) for maximum compatibility.
+            // clip-path: inset() and polygon() have coordinate-space issues with
+            // Leaflet's CSS transforms on pane elements.
             var leftRect = leftPane.getBoundingClientRect();
             var ldx = mapRect.left - leftRect.left;
-            var leftPct = leftRect.width > 0
-                ? Math.max(0, Math.min(100, (splitX + ldx) / leftRect.width * 100)).toFixed(2)
-                : '50.00';
-            leftPane.style.clipPath = 'polygon(0% 0%, ' + leftPct + '% 0%, ' + leftPct + '% 100%, 0% 100%)';
+            var ldy = mapRect.top  - leftRect.top;
+            leftPane.style.clip = 'rect(' + ldy + 'px, ' + (splitX + ldx) + 'px, ' + (h + ldy) + 'px, ' + ldx + 'px)';
 
             var rightRect = rightPane.getBoundingClientRect();
             var rdx = mapRect.left - rightRect.left;
-            var rightPct = rightRect.width > 0
-                ? Math.max(0, Math.min(100, (splitX + rdx) / rightRect.width * 100)).toFixed(2)
-                : '50.00';
-            rightPane.style.clipPath = 'polygon(' + rightPct + '% 0%, 100% 0%, 100% 100%, ' + rightPct + '% 100%)';
+            var rdy = mapRect.top  - rightRect.top;
+            rightPane.style.clip = 'rect(' + rdy + 'px, ' + (w + rdx) + 'px, ' + (h + rdy) + 'px, ' + (splitX + rdx) + 'px)';
 
             compareSliderEl.style.left = splitX + 'px';
         };
