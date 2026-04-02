@@ -88,8 +88,7 @@
         color: '#ff8f00',
         weight: 3,
         opacity: 0.95,
-        fillColor: '#ff8f00',
-        fillOpacity: 0.08
+        fill: false
     };
 
     // ── Register a Planetary Computer mosaic for a given NAIP year ──
