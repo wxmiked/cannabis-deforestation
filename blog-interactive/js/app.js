@@ -932,14 +932,10 @@
     }
 
     function initScrollOverflowIndicators() {
-        var contents = document.querySelectorAll('.step-content');
-        contents.forEach(function (el) {
-            // Wrap in a relative container so ::after can overlay the bottom
-            var wrapper = document.createElement('div');
-            wrapper.className = 'step-content-wrapper';
-            el.parentNode.insertBefore(wrapper, el);
-            wrapper.appendChild(el);
-
+        var wrappers = document.querySelectorAll('.step-content-wrapper');
+        wrappers.forEach(function (wrapper) {
+            var el = wrapper.querySelector('.step-content');
+            if (!el) return;
             function update() {
                 var overflows = el.scrollHeight > el.clientHeight + 4;
                 var atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 8;
