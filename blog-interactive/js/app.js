@@ -931,12 +931,33 @@
         });
     }
 
+    function initScrollOverflowIndicators() {
+        var contents = document.querySelectorAll('.step-content');
+        contents.forEach(function (el) {
+            // Wrap in a relative container so ::after can overlay the bottom
+            var wrapper = document.createElement('div');
+            wrapper.className = 'step-content-wrapper';
+            el.parentNode.insertBefore(wrapper, el);
+            wrapper.appendChild(el);
+
+            function update() {
+                var overflows = el.scrollHeight > el.clientHeight + 4;
+                var atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 8;
+                wrapper.classList.toggle('has-overflow', overflows && !atBottom);
+            }
+            update();
+            el.addEventListener('scroll', update);
+            window.addEventListener('resize', update);
+        });
+    }
+
     // ── Boot ──
     document.addEventListener('DOMContentLoaded', function () {
         resetScrollToStart();
         initMap();
         loadData();
         initScrollama();
+        initScrollOverflowIndicators();
     });
 
 })();
