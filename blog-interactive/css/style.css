@@ -700,6 +700,11 @@ a:hover {
         height: 55vh;
         position: sticky;
         top: 0;
+        z-index: 10;
+    }
+
+    .story {
+        z-index: 1;
     }
 
     .story {
