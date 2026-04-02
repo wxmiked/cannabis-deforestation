@@ -699,7 +699,7 @@
         // Reset clip on all NAIP panes
         ['naip-2014', 'naip-2016', 'naip-2018'].forEach(function (paneName) {
             var pane = map.getPane(paneName);
-            if (pane) { pane.style.clip = ''; pane.style.clipPath = ''; }
+            if (pane) { pane.style.clipPath = ''; }
         });
     }
 
@@ -749,20 +749,24 @@
             var h = mapRect.height;
             var splitX = Math.round(w * sliderPos);
 
-            // Compute clip in pane-local coords by compensating for pane transform
-            // Use clip-path: inset() — modern, Firefox-compatible replacement for
-            // the deprecated clip: rect() which Firefox has dropped.
+            // Use clip-path: polygon() with percentage values.
+            // Percentages are relative to the element's own dimensions (pre-transform),
+            // so this works correctly regardless of Leaflet's CSS transform offsets.
+            // clip: rect() was deprecated and dropped by Firefox; inset() has coordinate
+            // space issues with transformed elements.
             var leftRect = leftPane.getBoundingClientRect();
             var ldx = mapRect.left - leftRect.left;
-            var ldy = mapRect.top  - leftRect.top;
-            var leftRight = leftRect.width - (splitX + ldx);
-            leftPane.style.clipPath = 'inset(' + ldy + 'px ' + leftRight + 'px ' + '0px ' + ldx + 'px)';
+            var leftPct = leftRect.width > 0
+                ? Math.max(0, Math.min(100, (splitX + ldx) / leftRect.width * 100)).toFixed(2)
+                : '50.00';
+            leftPane.style.clipPath = 'polygon(0% 0%, ' + leftPct + '% 0%, ' + leftPct + '% 100%, 0% 100%)';
 
             var rightRect = rightPane.getBoundingClientRect();
             var rdx = mapRect.left - rightRect.left;
-            var rdy = mapRect.top  - rightRect.top;
-            var rightLeft = splitX + rdx;
-            rightPane.style.clipPath = 'inset(' + rdy + 'px 0px 0px ' + rightLeft + 'px)';
+            var rightPct = rightRect.width > 0
+                ? Math.max(0, Math.min(100, (splitX + rdx) / rightRect.width * 100)).toFixed(2)
+                : '50.00';
+            rightPane.style.clipPath = 'polygon(' + rightPct + '% 0%, 100% 0%, 100% 100%, ' + rightPct + '% 100%)';
 
             compareSliderEl.style.left = splitX + 'px';
         };
