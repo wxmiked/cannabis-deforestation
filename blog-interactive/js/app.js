@@ -18,7 +18,8 @@
     var PARCEL_BBOX = [[-120.98,37.92],[-120.31,37.92],[-120.31,38.46],[-120.98,38.46],[-120.98,37.92]];
 
     var TILE_OPTIONS = {
-        minZoom: 11,
+        minZoom: 8,
+        minNativeZoom: 11,
         maxNativeZoom: 18,
         maxZoom: 20,
         tms: false,
@@ -890,41 +891,72 @@
             layerNames.indexOf('butte-fire') !== -1 &&
             butteFireLayer;
 
+        // Apply layers after map animation completes so Leaflet renders tiles correctly.
+        // Adding a tile layer mid-animation causes Leaflet to defer tile loading and
+        // never recover — tiles only load when the view is stable.
+        function applyLayers() {
+            setVisibleLayers(layerNames);
+            if (isCompare) {
+                enableCompare(compareLeft, compareRight, compareLeftLabel, compareRightLabel);
+            }
+        }
+
         if (shouldFitParcels) {
             var parcelsBounds = parcelsLayer.getBounds();
             if (parcelsBounds && parcelsBounds.isValid()) {
-                map.flyToBounds(parcelsBounds.pad(0.02), {
-                    duration: 1.2,
-                    maxZoom: targetZoom
-                });
+                var parcelsApplied = false;
                 map.once('moveend', function () {
+                    if (parcelsApplied) return;
+                    parcelsApplied = true;
                     logMapView('step:' + stepId + ':parcels-fit');
+                    applyLayers();
                 });
+                map.flyToBounds(parcelsBounds.pad(0.02), { duration: 1.2, maxZoom: targetZoom });
+                setTimeout(function () {
+                    if (parcelsApplied) return;
+                    parcelsApplied = true;
+                    applyLayers();
+                }, 1400);
+            } else {
+                applyLayers();
             }
         } else if (shouldFitButte) {
             var butteBounds = butteFireLayer.getBounds();
             if (butteBounds && butteBounds.isValid()) {
-                map.flyToBounds(butteBounds.pad(0.08), {
-                    duration: 1.2,
-                    maxZoom: targetZoom
-                });
+                var butteApplied = false;
                 map.once('moveend', function () {
+                    if (butteApplied) return;
+                    butteApplied = true;
                     logMapView('step:' + stepId + ':butte-fit');
+                    applyLayers();
                 });
+                map.flyToBounds(butteBounds.pad(0.08), { duration: 1.2, maxZoom: targetZoom });
+                setTimeout(function () {
+                    if (butteApplied) return;
+                    butteApplied = true;
+                    applyLayers();
+                }, 1400);
+            } else {
+                applyLayers();
             }
         } else if (targetCenter) {
-            map.flyTo(targetCenter, targetZoom, { duration: 1.2 });
+            // Guard: if map is already at target, flyTo may not fire moveend.
+            // Use a short timeout as fallback.
+            var layersApplied = false;
             map.once('moveend', function () {
+                if (layersApplied) return;
+                layersApplied = true;
                 logMapView('step:' + stepId);
+                applyLayers();
             });
-        }
-
-        // Parse and set layers
-        setVisibleLayers(layerNames);
-
-        // Enable compare mode if requested
-        if (isCompare) {
-            enableCompare(compareLeft, compareRight, compareLeftLabel, compareRightLabel);
+            map.flyTo(targetCenter, targetZoom, { duration: 1.2 });
+            setTimeout(function () {
+                if (layersApplied) return;
+                layersApplied = true;
+                applyLayers();
+            }, 1400);
+        } else {
+            applyLayers();
         }
     }
 
