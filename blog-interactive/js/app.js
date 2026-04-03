@@ -18,7 +18,8 @@
     var PARCEL_BBOX = [[-120.98,37.92],[-120.31,37.92],[-120.31,38.46],[-120.98,38.46],[-120.98,37.92]];
 
     var TILE_OPTIONS = {
-        minZoom: 11,
+        minZoom: 8,
+        minNativeZoom: 11,
         maxNativeZoom: 18,
         maxZoom: 20,
         tms: false,
@@ -87,8 +88,7 @@
         color: '#ff8f00',
         weight: 3,
         opacity: 0.95,
-        fillColor: '#ff8f00',
-        fillOpacity: 0.08
+        fill: false
     };
 
     // ── Register a Planetary Computer mosaic for a given NAIP year ──
@@ -483,11 +483,31 @@
             });
         });
 
-        // Once all mosaics are registered, add layer control
+        // Once all mosaics are registered, add layer control and re-apply
+        // the current step's layers in case the user scrolled to a NAIP step
+        // before registration completed.
         Promise.all(promises).then(function () {
             refreshLayerControl();
-
             console.log('All NAIP mosaic layers ready');
+
+            // Re-apply layers for the active step if it uses NAIP
+            var activeStepEl = document.querySelector('.step.is-active');
+            if (activeStepEl) {
+                var layerStr = activeStepEl.getAttribute('data-layers');
+                if (layerStr && layerStr.indexOf('naip-') !== -1) {
+                    var layerNames = layerStr.split(',').map(function (n) { return n.trim(); });
+                    setVisibleLayers(layerNames);
+                    // Re-enable compare if needed
+                    var isCompare = activeStepEl.getAttribute('data-compare') === 'true';
+                    if (isCompare) {
+                        var compareLeft = activeStepEl.getAttribute('data-compare-left') || 'naip-2014';
+                        var compareRight = activeStepEl.getAttribute('data-compare-right') || 'naip-2018';
+                        var compareLeftLabel = activeStepEl.getAttribute('data-compare-left-label');
+                        var compareRightLabel = activeStepEl.getAttribute('data-compare-right-label');
+                        enableCompare(compareLeft, compareRight, compareLeftLabel, compareRightLabel);
+                    }
+                }
+            }
         });
     }
 
@@ -632,24 +652,29 @@
             return;
         }
 
-        // Add requested layers
+        // Add requested layers in a fixed z-order: NAIP tiles → county → butte fire → parcels → detections
+        // Butte fire must be below parcels so parcel popups are reachable (fire is non-interactive anyway).
         var activeYear = null;
+        var wantButte = layerNames.indexOf('butte-fire') !== -1;
+        var wantParcels = layerNames.indexOf('parcels') !== -1;
+        var wantDetections = layerNames.indexOf('detections') !== -1;
+
         layerNames.forEach(function (name) {
             if (name === 'county-boundary' && countyBoundaryLayer) {
                 countyBoundaryLayer.addTo(map);
-            } else if (name === 'parcels' && parcelsLayer) {
-                parcelsLayer.addTo(map);
-            } else if (name === 'detections') {
-                if (detectionsLayer) detectionsLayer.addTo(map);
-            } else if (name === 'butte-fire') {
-                if (butteFireLayer) butteFireLayer.addTo(map);
+            } else if (name === 'parcels' || name === 'detections' || name === 'butte-fire') {
+                // handled below in correct order
             } else if (layers[name]) {
                 layers[name].addTo(map);
-                // Track the year for the label
                 var match = name.match(/(\d{4})/);
                 if (match) activeYear = match[1];
             }
         });
+
+        // Add vector overlays in z-order: butte fire (bottom) → parcels → detections (top)
+        if (wantButte && butteFireLayer) butteFireLayer.addTo(map);
+        if (wantParcels && parcelsLayer) parcelsLayer.addTo(map);
+        if (wantDetections && detectionsLayer) detectionsLayer.addTo(map);
 
         if (countyBoundaryLayer && !map.hasLayer(countyBoundaryLayer)) {
             countyBoundaryLayer.addTo(map);
@@ -679,7 +704,7 @@
         // Reset clip on all NAIP panes
         ['naip-2014', 'naip-2016', 'naip-2018'].forEach(function (paneName) {
             var pane = map.getPane(paneName);
-            if (pane) pane.style.clip = '';
+            if (pane) { pane.style.clip = ''; pane.style.clipPath = ''; }
         });
     }
 
@@ -729,7 +754,10 @@
             var h = mapRect.height;
             var splitX = Math.round(w * sliderPos);
 
-            // Compute clip in pane-local coords by compensating for pane transform
+            // clip: rect() works on position:absolute elements (which Leaflet panes are).
+            // We set both clip (legacy) and clip-path (modern) for maximum compatibility.
+            // clip-path: inset() and polygon() have coordinate-space issues with
+            // Leaflet's CSS transforms on pane elements.
             var leftRect = leftPane.getBoundingClientRect();
             var ldx = mapRect.left - leftRect.left;
             var ldy = mapRect.top  - leftRect.top;
@@ -862,41 +890,72 @@
             layerNames.indexOf('butte-fire') !== -1 &&
             butteFireLayer;
 
+        // Apply layers after map animation completes so Leaflet renders tiles correctly.
+        // Adding a tile layer mid-animation causes Leaflet to defer tile loading and
+        // never recover — tiles only load when the view is stable.
+        function applyLayers() {
+            setVisibleLayers(layerNames);
+            if (isCompare) {
+                enableCompare(compareLeft, compareRight, compareLeftLabel, compareRightLabel);
+            }
+        }
+
         if (shouldFitParcels) {
             var parcelsBounds = parcelsLayer.getBounds();
             if (parcelsBounds && parcelsBounds.isValid()) {
-                map.flyToBounds(parcelsBounds.pad(0.02), {
-                    duration: 1.2,
-                    maxZoom: targetZoom
-                });
+                var parcelsApplied = false;
                 map.once('moveend', function () {
+                    if (parcelsApplied) return;
+                    parcelsApplied = true;
                     logMapView('step:' + stepId + ':parcels-fit');
+                    applyLayers();
                 });
+                map.flyToBounds(parcelsBounds.pad(0.02), { duration: 1.2, maxZoom: targetZoom });
+                setTimeout(function () {
+                    if (parcelsApplied) return;
+                    parcelsApplied = true;
+                    applyLayers();
+                }, 1400);
+            } else {
+                applyLayers();
             }
         } else if (shouldFitButte) {
             var butteBounds = butteFireLayer.getBounds();
             if (butteBounds && butteBounds.isValid()) {
-                map.flyToBounds(butteBounds.pad(0.08), {
-                    duration: 1.2,
-                    maxZoom: targetZoom
-                });
+                var butteApplied = false;
                 map.once('moveend', function () {
+                    if (butteApplied) return;
+                    butteApplied = true;
                     logMapView('step:' + stepId + ':butte-fit');
+                    applyLayers();
                 });
+                map.flyToBounds(butteBounds.pad(0.08), { duration: 1.2, maxZoom: targetZoom });
+                setTimeout(function () {
+                    if (butteApplied) return;
+                    butteApplied = true;
+                    applyLayers();
+                }, 1400);
+            } else {
+                applyLayers();
             }
         } else if (targetCenter) {
-            map.flyTo(targetCenter, targetZoom, { duration: 1.2 });
+            // Guard: if map is already at target, flyTo may not fire moveend.
+            // Use a short timeout as fallback.
+            var layersApplied = false;
             map.once('moveend', function () {
+                if (layersApplied) return;
+                layersApplied = true;
                 logMapView('step:' + stepId);
+                applyLayers();
             });
-        }
-
-        // Parse and set layers
-        setVisibleLayers(layerNames);
-
-        // Enable compare mode if requested
-        if (isCompare) {
-            enableCompare(compareLeft, compareRight, compareLeftLabel, compareRightLabel);
+            map.flyTo(targetCenter, targetZoom, { duration: 1.2 });
+            setTimeout(function () {
+                if (layersApplied) return;
+                layersApplied = true;
+                applyLayers();
+            }, 1400);
+        } else {
+            applyLayers();
         }
     }
 
@@ -904,10 +963,15 @@
     function initScrollama() {
         var scroller = scrollama();
 
+        // On mobile (stacked layout), the map occupies the top ~55vh and story
+        // cards sit below it. Use a lower offset so steps trigger when the top
+        // of the card enters the viewport rather than waiting for the midpoint.
+        var scrollamaOffset = window.innerWidth <= 900 ? 0.85 : 0.5;
+
         scroller
             .setup({
                 step: '.step',
-                offset: 0.5,
+                offset: scrollamaOffset,
                 progress: false,
                 debug: false
             })
@@ -931,12 +995,29 @@
         });
     }
 
+    function initScrollOverflowIndicators() {
+        var wrappers = document.querySelectorAll('.step-content-wrapper');
+        wrappers.forEach(function (wrapper) {
+            var el = wrapper.querySelector('.step-content');
+            if (!el) return;
+            function update() {
+                var overflows = el.scrollHeight > el.clientHeight + 4;
+                var atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 8;
+                wrapper.classList.toggle('has-overflow', overflows && !atBottom);
+            }
+            update();
+            el.addEventListener('scroll', update);
+            window.addEventListener('resize', update);
+        });
+    }
+
     // ── Boot ──
     document.addEventListener('DOMContentLoaded', function () {
         resetScrollToStart();
         initMap();
         loadData();
         initScrollama();
+        initScrollOverflowIndicators();
     });
 
 })();
