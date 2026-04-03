@@ -88,7 +88,8 @@
         color: '#ff8f00',
         weight: 3,
         opacity: 0.95,
-        fill: false
+        fill: false,
+        interactive: false
     };
 
     // ── Register a Planetary Computer mosaic for a given NAIP year ──
@@ -652,24 +653,29 @@
             return;
         }
 
-        // Add requested layers
+        // Add requested layers in a fixed z-order: NAIP tiles → county → butte fire → parcels → detections
+        // Butte fire must be below parcels so parcel popups are reachable (fire is non-interactive anyway).
         var activeYear = null;
+        var wantButte = layerNames.indexOf('butte-fire') !== -1;
+        var wantParcels = layerNames.indexOf('parcels') !== -1;
+        var wantDetections = layerNames.indexOf('detections') !== -1;
+
         layerNames.forEach(function (name) {
             if (name === 'county-boundary' && countyBoundaryLayer) {
                 countyBoundaryLayer.addTo(map);
-            } else if (name === 'parcels' && parcelsLayer) {
-                parcelsLayer.addTo(map);
-            } else if (name === 'detections') {
-                if (detectionsLayer) detectionsLayer.addTo(map);
-            } else if (name === 'butte-fire') {
-                if (butteFireLayer) butteFireLayer.addTo(map);
+            } else if (name === 'parcels' || name === 'detections' || name === 'butte-fire') {
+                // handled below in correct order
             } else if (layers[name]) {
                 layers[name].addTo(map);
-                // Track the year for the label
                 var match = name.match(/(\d{4})/);
                 if (match) activeYear = match[1];
             }
         });
+
+        // Add vector overlays in z-order: butte fire (bottom) → parcels → detections (top)
+        if (wantButte && butteFireLayer) butteFireLayer.addTo(map);
+        if (wantParcels && parcelsLayer) parcelsLayer.addTo(map);
+        if (wantDetections && detectionsLayer) detectionsLayer.addTo(map);
 
         if (countyBoundaryLayer && !map.hasLayer(countyBoundaryLayer)) {
             countyBoundaryLayer.addTo(map);
