@@ -904,13 +904,15 @@
             var parcelsBounds = parcelsLayer.getBounds();
             if (parcelsBounds && parcelsBounds.isValid()) {
                 var parcelsApplied = false;
+                var naipMinZoom = 11;
+                var fitZoom = Math.max(naipMinZoom, Math.min(targetZoom, map.getBoundsZoom(parcelsBounds.pad(0.02))));
                 map.once('moveend', function () {
                     if (parcelsApplied) return;
                     parcelsApplied = true;
                     logMapView('step:' + stepId + ':parcels-fit');
                     applyLayers();
                 });
-                map.flyToBounds(parcelsBounds.pad(0.02), { duration: 1.2, maxZoom: targetZoom });
+                map.flyTo(parcelsBounds.getCenter(), fitZoom, { duration: 1.2 });
                 setTimeout(function () {
                     if (parcelsApplied) return;
                     parcelsApplied = true;
