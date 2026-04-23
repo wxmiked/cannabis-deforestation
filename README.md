@@ -125,10 +125,10 @@ The `notebooks/` directory contains four Jupyter notebooks that walk through the
 
 | Notebook | Description |
 |---|---|
-| `01-custom-raster-dataset.ipynb` | Demonstrates how to build a custom TorchGeo raster dataset from NAIP imagery tiles and LabelMe annotations, including mask generation and dataset visualization. |
-| `02-create-cannabis-parcel-images.ipynb` | Fetches NAIP imagery for cannabis permit parcels from Microsoft Planetary Computer via the STAC API and exports clipped, masked tiles for annotation and training. |
-| `03-cannabis-segmentation-torchgeo.ipynb` | Trains a DeepLabV3+ / ResNeXt-50 semantic segmentation model on 5-channel NAIP imagery (RGBN + NDVI) to detect cannabis cultivation sites. Includes training loop, metrics, and inference visualizations. |
-| `04-search-cannabis-in-bbox.ipynb` | Searches for cannabis cultivation sites within an arbitrary bounding box using the trained model, demonstrating how to run inference on new areas of interest. |
+| [`01-custom-raster-dataset.ipynb`](notebooks/01-custom-raster-dataset.ipynb) | Demonstrates how to build a custom TorchGeo raster dataset from NAIP imagery tiles and LabelMe annotations, including mask generation and dataset visualization. |
+| [`02-create-cannabis-parcel-images.ipynb`](notebooks/02-create-cannabis-parcel-images.ipynb) | Fetches NAIP imagery for cannabis permit parcels from Microsoft Planetary Computer via the STAC API and exports clipped, masked tiles for annotation and training. |
+| [`03-cannabis-segmentation-torchgeo.ipynb`](notebooks/03-cannabis-segmentation-torchgeo.ipynb) | Trains a DeepLabV3+ / ResNeXt-50 semantic segmentation model on 5-channel NAIP imagery (RGBN + NDVI) to detect cannabis cultivation sites. Includes training loop, metrics, and inference visualizations. |
+| [`04-search-cannabis-in-bbox.ipynb`](notebooks/04-search-cannabis-in-bbox.ipynb) | Searches for cannabis cultivation sites within an arbitrary bounding box using the trained model, demonstrating how to run inference on new areas of interest. |
 
 ## Model Weights
 
