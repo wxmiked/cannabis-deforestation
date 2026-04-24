@@ -36,88 +36,11 @@ pdftotext -layout -nopgbrk data-to-import/calaveras-county/public-record-cannabi
 
 ### Using the cannabis cultivation sites parcel numbers to extract GIS data
 
-The parcel numbers were then used to extract the GIS data from the Calaveras County Parcel GIS data.
-
-Steps:
-1. Create a SQLite database to store the cannabis cultivation sites parcel numbers.
-    ```
-    ogr2ogr -f "SQLite" cannabis-parcels/cannabis-registry.sqlite cannabis-parcels/cannabis-registry-2018-commercial-apns.csv -nln cannabis_registry
-    ```
-2. Create a [VRT file](https://gdal.org/drivers/vector/vrt.html
-) to extract the GIS data from the Calaveras County Parcel GIS data. See [parcels.vrt](./cannabis-parcels/parcels.vrt) for the VRT file used.
-3. Run the OGR command to extract the GIS data from the Calaveras County Parcel GIS data.
-    ```
-    # Only extract parcels with cannabis permits (reduces file size from ~200MB to ~3MB)
-    ogr2ogr -f "GPKG" cannabis-parcels/cannabis-registry-2018-commercial-permits-parcels.gpkg \
-    cannabis-parcels/parcels.vrt \
-    -sql "SELECT p.* FROM parcels p INNER JOIN cannabis_registry c ON p.APN = c.apn" \
-    -dialect SQLite
-    ```
-    
-    **Note:** The original command used `LEFT JOIN` which included all 43,476 county parcels. Using `INNER JOIN` filters to only the ~712 parcels with cannabis permits, reducing file size by ~98%.
-
-### Using the cannabis cultivation sites parcel numbers to extract NAIP imagery
-
-The parcel numbers were then used to extract the NAIP imagery from the Calaveras County Parcel GIS data.
-
-Steps:
-1. Create a VRT file to extract the NAIP imagery from the Calaveras County Parcel GIS data. See [parcels.vrt](./cannabis-parcels/parcels.vrt) for the VRT file used.
+Parcel numbers were joined against Calaveras County's GIS parcel boundaries using `ogr2ogr` to produce a spatial dataset of ~712 permitted cultivation sites. See [`cannabis-parcels/README.md`](cannabis-parcels/README.md) for the full extraction steps.
 
 ### Annotating training data with LabelMe
 
-After extracting NAIP imagery tiles from permitted parcels, the images were manually annotated using [LabelMe](https://github.com/wkentaro/labelme) to create ground truth labels for training the semantic segmentation model.
-
-#### Installing LabelMe
-
-```bash
-pip install labelme
-```
-
-#### Annotation workflow
-
-1. **Launch LabelMe** with the directory containing extracted NAIP tiles:
-   ```bash
-   labelme cannabis-parcels/cannabis-parcels-masked/
-   ```
-
-2. **Create polygon annotations** by clicking points around cultivation sites. LabelMe will save a JSON file for each annotated image.
-
-3. **Use the following labels**:
-   - `cannabis` - Open-air cannabis cultivation sites (rows of plants, cleared areas with visible cultivation)
-   - `hoop house - old` - Greenhouse/hoop house structures used for cultivation
-   - `cannabis - old` - Abandoned or inactive cultivation sites (excluded from training)
-
-4. **Annotation tips**:
-   - Draw tight polygons around visible cultivation areas
-   - Include multiple polygons per image if there are multiple distinct grow sites
-   - Be consistent with polygon boundaries
-   - Skip images with no visible cultivation (these become negative examples)
-
-#### Output format
-
-LabelMe creates a JSON file for each annotated image containing:
-- Polygon coordinates in pixel space
-- Label names
-- Image metadata (filename, dimensions)
-
-Example structure:
-```json
-{
-  "version": "5.8.1",
-  "shapes": [
-    {
-      "label": "cannabis",
-      "points": [[x1, y1], [x2, y2], ...],
-      "shape_type": "polygon"
-    }
-  ],
-  "imagePath": "10019035_20160620.tif",
-  "imageHeight": 1133,
-  "imageWidth": 979
-}
-```
-
-The training code in `notebooks/cannabis-segmentation-torchgeo.ipynb` reads these JSON files and converts the pixel-space polygons to georeferenced masks using the image's geospatial transform.
+NAIP imagery tiles were manually annotated using [LabelMe](https://github.com/wkentaro/labelme) to create ground truth segmentation masks. See [`cannabis-parcels/README.md`](cannabis-parcels/README.md) for the annotation workflow, label definitions, and output format.
 
 ## Notebooks
 
