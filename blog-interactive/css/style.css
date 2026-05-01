@@ -809,3 +809,46 @@ a:hover {
         font-size: 0.8rem;
     }
 }
+
+/* ===== Comments (utteranc.es) ===== */
+
+.comments-section {
+    background: #0f0f0f;
+    border-top: 1px solid #2a2a2a;
+    padding: 3rem 1.5rem 4rem;
+}
+
+.comments-container {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.comments-heading {
+    font-family: 'Merriweather', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #f4f1ea;
+    margin: 0 0 0.5rem;
+}
+
+.comments-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #888;
+    margin: 0 0 1.75rem;
+}
+
+.comments-note a {
+    color: #aaa;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.comments-note a:hover {
+    color: #f4f1ea;
+}
+
+/* Constrain the utteranc.es iframe width */
+.utterances {
+    max-width: 100% !important;
+}
