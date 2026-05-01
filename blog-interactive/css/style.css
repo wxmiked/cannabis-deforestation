@@ -744,17 +744,19 @@ a:hover {
         width: 100%;
     }
 
+    /* Reserve ~5rem for panel padding (1rem top+bottom) + figcaption (~3rem)
+       so captions are not clipped by #map-container overflow:hidden */
     .environment-media-figure img,
     .after-ban-media-figure img,
     .conclusion-slideshow {
-        height: 42vh;
+        height: calc(55vh - 5rem);
         max-height: none;
     }
 
     .conclusion-media-figure img {
         position: relative;
         inset: auto;
-        height: 42vh;
+        height: calc(55vh - 5rem);
     }
 }
 
@@ -770,6 +772,18 @@ a:hover {
 
     #map-container {
         height: 45vh;
+    }
+
+    /* Recalculate image heights for smaller container so figcaptions
+       are not clipped — 45vh container minus panel padding + caption */
+    .environment-media-figure img,
+    .after-ban-media-figure img,
+    .conclusion-slideshow {
+        height: calc(45vh - 5rem);
+    }
+
+    .conclusion-media-figure img {
+        height: calc(45vh - 5rem);
     }
 
     .step {
