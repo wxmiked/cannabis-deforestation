@@ -177,6 +177,5 @@ data-to-import/usgs/naip/**/*.vrt
 *.tif.aux.xml
 *.DS_Store
 
-# DWR Crop Mapping — large raw data files (download via SOURCE.md instructions)
+# DWR Crop Mapping — large raw zip (download via SOURCE.md instructions; do not unzip)
 data-to-import/dwr-crop-mapping-2016/*.zip
-data-to-import/dwr-crop-mapping-2016/i15_Crop_Mapping_2016_GDB/

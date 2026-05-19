@@ -12,14 +12,17 @@ canopy (vineyards, orchards), or mowing/tilling row patterns (pasture, grain).
 
 Usage:
     python scripts/build_dwr_crop_mask.py \
-        --gdb data-to-import/dwr-crop-mapping-2016/i15_Crop_Mapping_2016_GDB/i15_Crop_Mapping_2016.gdb \
+        --gdb data-to-import/dwr-crop-mapping-2016/i15_crop_mapping_2016_gdb.zip \
         --county Calaveras \
         --out data-to-import/dwr-crop-mapping-2016/calaveras_crop_mask_2016.geojson
+
+The GDB is read directly from the zip file via GDAL's /vsizip/ virtual
+filesystem — no extraction needed. The zip path is auto-wrapped.
 
 Dependencies: fiona, shapely, pyproj
     pip install fiona shapely pyproj
 
-Schema notes (confirmed via ogrinfo on i15_Crop_Mapping_2016.gdb):
+Schema notes (confirmed via fiona on i15_crop_mapping_2016_gdb.zip):
     Layer:       i15_Crop_Mapping_2016
     Source CRS:  EPSG:3857 (Web Mercator)
     Class field: Symb_class (str:4) — preferred over CLASS2 which has leading spaces
@@ -70,7 +73,7 @@ def parse_args():
     p.add_argument(
         "--gdb",
         required=True,
-        help="Path to the DWR Statewide Crop Mapping .gdb directory",
+        help="Path to the DWR Statewide Crop Mapping .gdb directory or .zip file",
     )
     p.add_argument(
         "--county",
@@ -111,7 +114,7 @@ def should_mask(symb_class: str) -> bool:
 
 def main():
     args = parse_args()
-    gdb_path = str(Path(args.gdb).resolve())
+    raw_path = str(Path(args.gdb).resolve())
     out_path = str(Path(args.out).resolve())
 
     try:
@@ -122,6 +125,24 @@ def main():
         print(f"ERROR: Missing dependency: {e}", file=sys.stderr)
         print("Install with: pip install fiona shapely pyproj", file=sys.stderr)
         sys.exit(1)
+
+    # If given a zip, wrap with GDAL's vsizip virtual filesystem.
+    # The zip contains a single .gdb inside a subdirectory; fiona/GDAL
+    # can list and open it directly without extraction.
+    if raw_path.endswith(".zip"):
+        # List what's inside to find the .gdb path
+        import zipfile
+        with zipfile.ZipFile(raw_path) as zf:
+            gdb_entries = [n for n in zf.namelist() if n.endswith(".gdb/") or ".gdb/" in n]
+            # Extract the .gdb directory name (e.g. "i15_Crop_Mapping_2016_GDB/i15_Crop_Mapping_2016.gdb")
+            gdb_dirs = sorted({n.split(".gdb/")[0] + ".gdb" for n in gdb_entries if ".gdb/" in n})
+        if not gdb_dirs:
+            print("ERROR: No .gdb found inside zip", file=sys.stderr)
+            sys.exit(1)
+        gdb_path = f"/vsizip/{raw_path}/{gdb_dirs[0]}"
+        print(f"Reading GDB from zip: {gdb_dirs[0]}")
+    else:
+        gdb_path = raw_path
 
     # Detect layer
     layer = args.layer

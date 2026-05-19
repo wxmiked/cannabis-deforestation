@@ -17,10 +17,11 @@ Prepared by: Land IQ LLC, reviewed/revised by DWR Regional Office staff
 ```bash
 curl -L -o data-to-import/dwr-crop-mapping-2016/i15_crop_mapping_2016_gdb.zip \
   "https://data.cnra.ca.gov/dataset/6c3d65e3-35bb-49e1-a51e-49d5a2cf09a9/resource/489d7ab8-f68a-45b4-8113-bb89bc4d9a9c/download/i15_crop_mapping_2016_gdb.zip"
-unzip i15_crop_mapping_2016_gdb.zip -d data-to-import/dwr-crop-mapping-2016/
 ```
 
-The zip file (83 MB) and extracted GDB are excluded from git. See `.gitignore`.
+The zip file (83 MB) is excluded from git. See `.gitignore`. **Do not unzip** —
+the script reads the GDB directly from the zip via GDAL's `/vsizip/` virtual
+filesystem.
 
 ## Schema (confirmed via fiona inspection, 2026-05-19)
 
@@ -64,7 +65,7 @@ classification is still deciduous orchard, which presents FP NIR signatures.
 
 ```bash
 python scripts/build_dwr_crop_mask.py \
-    --gdb data-to-import/dwr-crop-mapping-2016/i15_Crop_Mapping_2016_GDB/i15_Crop_Mapping_2016.gdb \
+    --gdb data-to-import/dwr-crop-mapping-2016/i15_crop_mapping_2016_gdb.zip \
     --county Calaveras \
     --out data-to-import/dwr-crop-mapping-2016/calaveras_crop_mask_2016.geojson
 ```
