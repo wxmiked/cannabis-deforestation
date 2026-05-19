@@ -67,15 +67,24 @@ classification is still deciduous orchard, which presents FP NIR signatures.
 python scripts/build_dwr_crop_mask.py \
     --gdb data-to-import/dwr-crop-mapping-2016/i15_crop_mapping_2016_gdb.zip \
     --county Calaveras \
+    --boundary data-to-import/calaveras-county/boundary/COUNTY_BOUNDARY.kml \
     --out data-to-import/dwr-crop-mapping-2016/calaveras_crop_mask_2016.geojson
 ```
 
 Dependencies: `pip install fiona shapely pyproj`
 
+The `--boundary` flag clips all output geometries to the Calaveras County
+boundary polygon via Shapely intersection. All 426 features survived the
+clip (they were already fully within the county per the DWR `County` field),
+but the clip ensures no geometry bleeds outside the county line.
+
+Boundary source: `data-to-import/calaveras-county/boundary/COUNTY_BOUNDARY.kml`  
+Boundary CRS: EPSG:4326 (KML default)
+
 ## Output File
 
-`calaveras_crop_mask_2016.geojson` — 426 features, EPSG:4326  
-Committed to git (small enough; ~600KB).
+`calaveras_crop_mask_2016.geojson` — 426 features, EPSG:4326, clipped to county boundary  
+Committed to git (~710KB).
 
 ## Notes on CLASS2 vs Symb_class
 

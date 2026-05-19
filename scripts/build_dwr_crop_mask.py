@@ -19,6 +19,9 @@ Usage:
 The GDB is read directly from the zip file via GDAL's /vsizip/ virtual
 filesystem — no extraction needed. The zip path is auto-wrapped.
 
+Pass --boundary to a KML or GeoJSON file to clip the output to a county
+boundary polygon. Shapely intersection is used; empty geometries are dropped.
+
 Dependencies: fiona, shapely, pyproj
     pip install fiona shapely pyproj
 
@@ -86,6 +89,11 @@ def parse_args():
         help="GDB layer name. Auto-detected if omitted.",
     )
     p.add_argument(
+        "--boundary",
+        default=None,
+        help="Optional path to a KML or GeoJSON boundary file (EPSG:4326) to clip output",
+    )
+    p.add_argument(
         "--class-field",
         default="Symb_class",
         help="Field containing land use class (default: Symb_class)",
@@ -120,11 +128,49 @@ def main():
     try:
         import fiona
         from pyproj import Transformer
-        from shapely.geometry import mapping, shape
+        from shapely.geometry import mapping, shape, Polygon
+        from shapely.ops import transform as shp_transform
     except ImportError as e:
         print(f"ERROR: Missing dependency: {e}", file=sys.stderr)
         print("Install with: pip install fiona shapely pyproj", file=sys.stderr)
         sys.exit(1)
+
+    # --- Load optional boundary polygon for clipping ---
+    boundary_poly = None
+    if args.boundary:
+        boundary_path = str(Path(args.boundary).resolve())
+        print(f"Loading boundary: {boundary_path}")
+        if boundary_path.endswith(".kml"):
+            # Parse KML with stdlib xml — avoids GDAL KML driver requirement
+            import xml.etree.ElementTree as ET
+            tree = ET.parse(boundary_path)
+            coords_text = None
+            for elem in tree.getroot().iter():
+                if elem.tag.endswith("coordinates"):
+                    coords_text = elem.text.strip()
+                    break
+            if not coords_text:
+                print("ERROR: No <coordinates> found in KML", file=sys.stderr)
+                sys.exit(1)
+            pairs = []
+            for token in coords_text.split():
+                parts = token.split(",")
+                pairs.append((float(parts[0]), float(parts[1])))
+            boundary_poly = Polygon(pairs)
+        else:
+            # GeoJSON
+            with open(boundary_path) as f:
+                import json as _json
+                gj = _json.load(f)
+            if gj["type"] == "FeatureCollection":
+                boundary_poly = shape(gj["features"][0]["geometry"])
+            elif gj["type"] == "Feature":
+                boundary_poly = shape(gj["geometry"])
+            else:
+                boundary_poly = shape(gj)
+        if not boundary_poly.is_valid:
+            boundary_poly = boundary_poly.buffer(0)
+        print(f"Boundary loaded: {len(list(boundary_poly.exterior.coords))} vertices, bounds={boundary_poly.bounds}")
 
     # If given a zip, wrap with GDAL's vsizip virtual filesystem.
     # The zip contains a single .gdb inside a subdirectory; fiona/GDAL
@@ -205,13 +251,19 @@ def main():
             crop_label = (props.get("Crop2016") or "").strip()
             crop_counts[crop_label] = crop_counts.get(crop_label, 0) + 1
 
-            # Reproject geometry if needed
-            geom = feat["geometry"]
+            # Reproject geometry
+            geom_shape = shape(feat["geometry"])
             if transformer:
-                shp = shape(geom)
-                from shapely.ops import transform as shp_transform
-                reprojected = shp_transform(transformer.transform, shp)
-                geom = mapping(reprojected)
+                geom_shape = shp_transform(transformer.transform, geom_shape)
+
+            # Clip to boundary if provided
+            if boundary_poly is not None:
+                geom_shape = geom_shape.intersection(boundary_poly)
+                if geom_shape.is_empty:
+                    kept -= 1
+                    continue
+
+            geom = mapping(geom_shape)
 
             features_out.append({
                 "type": "Feature",
@@ -263,6 +315,9 @@ def main():
     print("  3. Apply mask in inference: rasterize to NAIP tile CRS/resolution,")
     print("     zero out predicted-positive pixels within mask polygons")
     print("  4. Run with --county Calaveras (default) for inference; adjust for other counties")
+    if args.boundary is None:
+        print("  5. Consider re-running with --boundary to clip geometries to the county boundary")
+        print("     e.g.: --boundary data-to-import/calaveras-county/boundary/COUNTY_BOUNDARY.kml")
 
 
 if __name__ == "__main__":
