@@ -21,6 +21,9 @@ dev = [
     "isort",
 ]
 
+[project.scripts]
+county-infer = "cannabis_deforestation.county_inference:main"
+
 [tool.hatch.build.targets.wheel]
 packages = ["cannabis_deforestation"]
 
