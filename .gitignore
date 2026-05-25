@@ -174,5 +174,8 @@ cython_debug/
 
 data-to-import/usgs/naip/**/*.tif
 data-to-import/usgs/naip/**/*.vrt
+data-to-import/microsoft/naip/**/*.tif
+data-to-import/microsoft/naip/**/*.vrt
+results/inference/
 *.tif.aux.xml
 *.DS_Store
