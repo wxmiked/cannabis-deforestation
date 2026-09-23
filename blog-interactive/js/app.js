@@ -17,6 +17,21 @@
     // Bounding box covering all cannabis parcels (with buffer)
     var PARCEL_BBOX = [[-120.98,37.92],[-120.31,37.92],[-120.31,38.46],[-120.98,38.46],[-120.98,37.92]];
 
+    // Precomputed mosaic search IDs for each NAIP year (PARCEL_BBOX + year date range).
+    // Planetary Computer's /mosaic/register endpoint hashes the search body into a
+    // deterministic ID, but its OPTIONS handler for that route always returns 405,
+    // so browsers can never complete the CORS preflight for a POST from any origin
+    // (verified directly against the API — not an allow-listed-origin issue). We
+    // register the searches once from a trusted (non-browser) client and hardcode
+    // the resulting IDs here; the tile requests themselves are plain <img> GETs,
+    // which never require a preflight. Re-run scripts/register-naip-mosaics.sh if
+    // PARCEL_BBOX or the year list changes.
+    var NAIP_SEARCH_IDS = {
+        '2014': '7e0f1c3e8cbed8f6c961708dec3be4d9',
+        '2016': 'bfcd79ca8dff56ab7061250bf0455af6',
+        '2018': 'df464f1d06e9696b84daeac7f22c0810'
+    };
+
     var TILE_OPTIONS = {
         minZoom: 8,
         minNativeZoom: 11,
@@ -91,46 +106,13 @@
         fill: false
     };
 
-    // ── Register a Planetary Computer mosaic for a given NAIP year ──
+    // ── Build the tile URL for a given NAIP year's precomputed mosaic ──
     function registerMosaic(year) {
-        var body = {
-            collections: ['naip'],
-            'filter-lang': 'cql2-json',
-            filter: {
-                op: 'and',
-                args: [
-                    {
-                        op: 's_intersects',
-                        args: [
-                            { property: 'geometry' },
-                            { type: 'Polygon', coordinates: [PARCEL_BBOX] }
-                        ]
-                    },
-                    { op: '>=', args: [{ property: 'datetime' }, year + '-01-01T00:00:00Z'] },
-                    { op: '<=', args: [{ property: 'datetime' }, year + '-12-31T23:59:59Z'] }
-                ]
-            }
-        };
-
-        startMapLoading();
-        return fetch(PC_BASE + '/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        })
-        .then(function (r) {
-            if (!r.ok) throw new Error('Mosaic register failed (' + r.status + ') for ' + year);
-            return r.json();
-        })
-        .then(function (data) {
-            if (!data.searchid) throw new Error('No searchid for ' + year);
-            var tileUrl = PC_BASE + '/' + data.searchid +
-                '/tiles/WebMercatorQuad/{z}/{x}/{y}?' + PC_TILE_PARAMS;
-            return tileUrl;
-        })
-        .finally(function () {
-            stopMapLoading();
-        });
+        var searchId = NAIP_SEARCH_IDS[year];
+        if (!searchId) return Promise.reject(new Error('No precomputed mosaic search ID for ' + year));
+        var tileUrl = PC_BASE + '/' + searchId +
+            '/tiles/WebMercatorQuad/{z}/{x}/{y}?' + PC_TILE_PARAMS;
+        return Promise.resolve(tileUrl);
     }
 
     function updateMapLoadingIndicator() {
